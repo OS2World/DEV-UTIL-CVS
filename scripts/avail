@@ -1,0 +1,31 @@
+#
+# $Id: avail,v 1.1.3.1 1999/06/17 15:20:45 root Exp $
+#
+# The avail file determines whether you may commit files.  It contains
+# lines read from top to bottom, keeping track of a single "bit".  The
+# "bit" defaults to "on".  It can be turned "off" by "unavail" lines and
+# "on" by "avail" lines.  ==> Last one counts.
+#
+# Any line not beginning with "avail" or "unavail" is ignored.
+#
+# Lines beginning with "avail" or "unavail" are assumed to be '|'-
+# separated triples: (All spaces and tabs are ignored in a line.)
+#
+#   {avail.*,unavail.*} [| user,user,... [| repos,repos,...]]
+#
+#    1. String starting with "avail" or "unavail".
+#    2. Optional, comma-separated list of usernames.
+#    3. Optional, comma-separated list of repository pathnames.
+#   These are pathnames relative to %CVSROOT%.  They can be directories
+#   or filenames.  A directory name allows access to all files and
+#   directories below it.
+#
+# Example:  (Text from the ';;' rightward may not appear in the file.)
+#
+#   unavail                 ;; Make whole repository unavailable.
+#   avail|ahuber            ;; Except for user "ahuber".
+#   avail|fred, john|bin/ls ;; Except when "fred" or "john" commit to
+#                           ;; the module whose repository is "bin/ls"
+#
+#unavail
+#avail|ahuber

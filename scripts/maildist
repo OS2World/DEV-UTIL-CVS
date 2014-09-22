@@ -1,0 +1,50 @@
+#
+# $Id: maildist,v 1.1.3.1 1999/06/17 15:20:46 root Exp $
+#
+# The maildist (Mail Distribution) file is used by the loginfo script
+# and serves two purposes:
+#
+#  - specifiying the recipients of commit messages.
+#  - specifiying the file to save commit messages to.
+#
+# The format is:
+#
+#  <module[/dir...]|ALL|DEFAULT><white space><distribution list>
+#
+#  The distribution list is a comma or white space separated list of
+#  file names and/or email addresses.
+#
+# A matching repository is a module[/dir...] in the first column that
+# matches the repository or is a parent of the repository.
+#
+# For a matching repository, the commit message is sent to each email
+# address in the distribution list and for each file name in the 
+# distribution list, the commit message it appended to the file
+# %CVSROOT%\CVSROOT\commitlogs\<file name>.
+#
+# If no matching repository is found, the distribution list specified
+# by DEFAULT in the first column is used.
+#
+# In addition, any distribution list specified by ALL in the first
+# column is also used.
+#
+# Using the example below:
+#
+#  If the repository is module then commit messages are sent to
+#  module@ping.at, dir@ping.at, and all@ping.at as well as appended
+#  to the files ...\commitlogs\module, ...\commitlogs\dir, and
+#  ...\commitlogs\all.
+#
+#  If the repository is module/dir then commit messages are sent to
+#  dir@ping.at and all@ping.at as well as appended to the files
+#  ...\commitlogs\dir and ...\commitlogs\all.
+#
+#  If the repository is module/test then commit messages are sent to
+#  all@ping.at and default@ping.at as well as appended to the files
+#  ...\commitlogs\all and ...\commitlogs\default.
+#
+#module			module, module@ping.at
+#module/dir		dir, dir@ping.at
+#ALL			all, all@ping.at
+#DEFAULT		default, default@ping.at
+

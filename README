@@ -1,0 +1,284 @@
+
+0. What is it?
+
+	This is an EMX port of the Concurrent Versions System (CVS) -
+	an interim 1.12 release on the fabulous "emx-new" branch.
+
+	Features include:
+		* Full client (:ext:, :server: and :pserver:).
+		* Full server (via rshd) and pserver (via inetd).
+		* Documentation in .INF format.
+		* Utility to maintain the password file (for
+		  pserver authentication).
+		* Rshd replacement for use with the server.
+		* Direct execution of shell scripts, Rexx
+		  scripts, #! scripts (including perl and sh) and
+		  PM applications (e.g. PM editors).
+		* Rexx scripts to control access to the repository,
+		  to distribute commit messages, and to semi-
+		  automatically maintain ChangeLogs.
+		* Long track record of compatibility and maintenance
+		  on OS/2
+		* Passes both local and remote sanity tests.
+
+	Note: this branch, previously developed by Andrew Belov for a
+	course of few years, is not maintained any longer. For "help
+        yourself" information, see the accompanying BUILD file.
+
+1. Contents.
+
+	.\
+		README		- You're just reading it.
+		COPYING		- The GNU public license.
+		BUILD		- Build/hacking instructions.
+
+	bin\
+		cvs.exe		- The CVS executable (client/server).
+		rxrun.exe	- Runs Rexx scripts without a shell.
+		rshd.exe	- An RSHD replacement.
+		cvspw.exe	- Manipulates the passwd file.
+	        cvs2log.cmd     - (Semi-)Automatically maintains ChangeLogs.
+	        tokenize.cmd    - Tokenizes read-only Rexx scripts in your
+
+	book\
+		intro.inf	- An introduction to CVS.
+		cvs.inf		- The CVS reference manual.
+	        ossdev.inf      - A guide to Open-Source development
+	                          using CVS.
+	        cvs-client.inf  - The client/server protocol reference.
+		install.cmd	- Creates a folder with book objects for
+	                          the manuals.
+
+	dll\
+	        gcc*.dll        - May contain traces of GCC run-time library
+
+	info\
+	        intro.info      - An introduction to CVS.
+	        cvs.info        - The CVS reference manual.
+	        ossdev.info     - A guide to Open-Source development
+	                          using CVS.
+	        cvs-client.info - The client/server protocol reference.
+
+	man\
+		man.1.gz	- The CVS command manual
+		man.5.gz	- The CVS configuration manual
+
+	scripts\
+		README		- Read this first.
+	        commitinfo.cmd  - Performs repository access control.
+		loginfo.cmd	- Creates and distributes commit messages.
+	        verifymsg.cmd   - Just a template at this point.
+		.cvsauthors	- Describes each committer.
+		avail		- Describes repository access control.
+		maildist	- Describes commit message distribution.
+	        fix-diff.awk    - Awk script to fix 'cvs diff -c' generated
+	                          diffs.
+
+	src\
+		BUILD		- Read this if you want to build CVS
+	                          yourself.
+		diffs		- Patches to the GNU CVS v 1.12.x release.
+		emx-new.zip	- The new EMX port.
+
+2. Installation.
+
+   Prerequisites:
+
+	- OS/2 v 3.0 with XR_W025 or higher
+
+	- EMX run-time libraries (v 0.9d or higher)
+
+	- For local or CVS server setup, a partition capable of supporting
+	  long filenames to establish the repository (e.g., HPFS, JFS or a
+	  remote disk over LAN).
+
+	- For CVS client or server, the MPTS subsystem at WR08200 or
+	  higher, or IBM Internet Connection for OS/2 Warp 3.
+
+   General installation:
+
+	- Edit CONFIG.SYS to add X:\CVS\BIN to your PATH. Make sure you
+	  have the EMX 0.9d (or later) runtime installed.
+
+	- Specify a temporary directory with SET TMPDIR=<pathname>.
+	  CVS no longer accepts neither TEMP nor TMP.
+
+	The following two steps are only required for server and local
+	installations. They are NOT required for client-only installations.
+
+	- If you don't want to use TEDIT to edit your commit messages
+	  and ChangeLogs, add "set CVSEDITOR=<your favorite editor>" to
+	  CONFIG.SYS. Be sure to include any options and arguments your
+	  editor might require. To use EPM, add "set CVSEDITOR=epm /m".
+	  If you are using emacsclient, add "set CVSEDITOR=emacsclient".
+	  Type C-x # to continue the commit.
+
+	- To access the manual pages (with GNU man + roff + less), pick a
+	  storage point for the files that go in the "man" directory. Usually
+	  these files are placed into the common manual page directory, where
+	  cvs.1.gz goes to "man1" subdirectory and cvs.5.gz is placed into
+	  "man5".
+
+	- Add the following environment variable to your CONFIG.SYS, if it
+	  doesn't already exist:
+
+		set LOGNAME=<your login name>
+
+	- To create book objects for the CVS documentation on your desktop
+	  run the install script in the BOOK directory (change to the BOOK
+	  directory first).
+
+   Local/server:
+
+	- Create a new directory that will serve as your repository.
+
+	- Add the CVSROOT environment variable to your CONFIG.SYS:
+
+	        set CVSROOT=<your repository>
+
+	  Path components are separated by forward slashes. Be sure to
+	  specify
+	  the :local: keyword, e.g.: set CVSROOT=:local:c:/cvsfiles
+
+	- For server and local installations, initialize your repository:
+
+		cvs init
+
+	- If you want repository access control, commit messages emailed
+	  and/or ChangeLogs (semi-)automatically maintained, take a look
+	  at the SCRIPTS directory.
+
+	- If you do not need server functionality, reboot now and you should
+	  be able to access CVS locally.
+
+   Client:
+
+	- Decide the way to be used for connecting to server.
+
+	- If you are using RSH, set CVSROOT as follows:
+
+	        set CVSROOT=:server:<username>@<netaddress>:<repository>
+
+	  TIP: Do NOT set CVS_RSH if you are using the standard IBM RSH
+	  client to run CVS. Without CVS_RSH, CVS assumes you are using
+	  IBM's RSH.EXE and supplies the "-b" parameter, required to
+	  handle binary streams correctly. You may only set CVS_RSH if
+	  your RSH client is transparent with respect to binary data and
+	  does not, unlike RSH.EXE, need the "-b" switch to maintain
+	  consistency.
+
+	- If you are using SSH, do this:
+
+	        set CVS_RSH=ssh
+	        set CVSROOT=:ext:<username>@<netaddress>:<repository>
+
+	  This package has only been tested with the SSH v 1.2.13 port
+	  dated March 11, 1997. Status of later versions is unknown.
+
+	- If you are using a pserver, do this:
+
+	        set CVSROOT=:pserver:<username>@<netaddress>:<repository>
+		cvs login
+
+	- Reboot.
+
+   Server:
+
+	- To setup a server or pserver, go to the 'Autostart' page in your
+	  TCP/IP configuration notebook and enable inetd.
+
+	- Edit %ETC%\inetd.lst to add the line
+
+		cmd tcp X:\CVS\BIN\RSHD
+
+	  for a server and/or the line
+
+		cvspserver tcp cvs --allow-root=<your repository> pserver
+
+	  for a pserver. You also need to add the line
+
+		cvspserver 2401/tcp
+
+	  to %ETC%\services.
+
+	  Note: You have re-do this step each time your TCP/IP configuration
+	  is updated. A backup of %ETC%\inetd.lst is saved to %ETC%\inetd.bk?.
+
+	- If you are using RSHD, go to the second 'Security' page in your
+	  TCP/IP configuration notebook and add each host/user you want to
+	  serve.
+
+	- If you are setting up a pserver, you have to setup a passwd file:
+
+		md work
+		cd work
+		cvs co CVSROOT
+		cd CVSROOT
+		cvspw -add <login name> <password>
+
+	  Repeat the last line for each login name.
+
+	  Edit the file checkoutlist to add the line:
+
+		passwd
+
+	  In file config uncomment the line "SystemAuth=no". Failing to do it
+	  will result in your repository being accessible to everyone if they
+	  supply a username not listed in the passwd file.
+
+	- Finally add the file passwd to the repository and commit:
+
+		cvs add passwd
+		cvs commit -m "<your log message>"
+
+	  You can now remove work\CVSROOT.
+
+	- Reboot. Your server should now be able to accept requests.
+
+3. BUGS.
+
+	The logic for preventing checkouts that were inadvertently aimed
+	into repository is unreliable due to the dualism of path separators
+	and the existence of drive letters (well, the general problem is
+	that strcmp() is not suitable for comparing paths anyway).
+
+4. Credits and feedback.
+
+	CVS was ported to OS/2 in a variety of ways, so there are distinct
+        "os2", "emx" and "emx-new" ports. The "emx-new" branch grew out of
+	patches by Murray Bishop with subsequent maintenance by Andreas
+	Huber (1998), who set the quality standard for "emx-new" with his
+	thoroughly polished port of CVS v 1.10. Shaun Tancheff maintained
+	"emx-new" during 1999, covering the 1.10.x releases that followed.
+
+	From version 1.10.6 up to 1.12.13, the OS/2 "emx-new" branch of CVS
+        was maintained by Andrew Belov <andrew_belov@mtu-net.ru> with a
+	considerable input from the OS/2 programming community.
+
+	The position of maintainer for "emx-new" is currently vacant. Feel
+        free to take over this project.
+
+	When submitting an OS/2-related problem, please include the "trace"
+	output ("cvs -t" with the failing options appended), indicate the
+	version of CVS being used and attach a "core" file if a SIGSEGV was
+	observed. A brief reproduction scenario would be especially helpful.
+
+	For any questions about CVS in general, please consider subscribing
+	to one of CVS mailing lists at http://cvs.nongnu.org.
+
+5. Availability.
+
+	The most recent version will eventually become available at the ftp
+	sites below ("*" matches suffixes that designate individual releases
+        based on a common major version):
+
+	ftp://hobbes.nmsu.edu/pub/os2/unix/dev/cvs112*.zip
+
+	GFD (German Fileecho Distribution):
+
+	Area GFD.DEV.TOOL, cvs112*.zip
+
+	It may also be made available on CIS:
+
+	Forum: OS2CDEV  Section: Development Tools      File: cvs112*.zip
+	Forum: GEROS2   Section: SW Engineering         File: cvs112*.zip

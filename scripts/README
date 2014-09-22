@@ -1,0 +1,101 @@
+
+1. Installation.
+
+	- Checkout CVSROOT from your repository:
+
+		md work
+		cd work
+		cvs co CVSROOT
+		cd CVSROOT
+
+	- Copy the following files to the work\CVSROOT directory:
+
+		commitinfo.cmd
+		loginfo.cmd
+		verifymsg.cmd
+		maildist
+		avail
+
+	- Add the new files to your repository:
+
+		cvs add commitinfo.cmd loginfo.cmd verifymsg.cmd
+		cvs add maildist avail
+
+	- Add the following lines to checkoutlist:
+
+		commitinfo.cmd
+		loginfo.cmd
+		verifymsg.cmd
+		maildist
+		avail
+
+	- Edit maildist and/or avail to suit your needs.
+
+		See the comments in the respective files on the format.
+		Be sure to read the comments in commitinfo.cmd and
+		loginfo.cmd first.
+
+	- Add the following line to commitinfo:
+
+		ALL			$CVSROOT/CVSROOT/commitinfo.cmd -r
+
+		If you want to perform access control, add the -A option:
+
+		ALL			$CVSROOT/CVSROOT/commitinfo.cmd -rA
+
+	- Add the following line to loginfo:
+
+		DEFAULT		$CVSROOT/CVSROOT/loginfo.cmd %s
+
+		Note: If you want to email the commit messages (see maildist),
+		be sure to have a properly configured sendmail. You may also
+		want to setup .cvsauthors (see below) at this point, so loginfo
+		can determine the committers full name and email address to be
+		used as the 'From:' address for commit messages.
+
+	- Now commit the changes:
+
+		cvs commit -m "your log message"
+
+	- Since CVS makes all the files in your repository's CVSROOT
+	  directory read-only (thus preventing the Rexx interpreter from
+	  saving the tokenized image), a little script is provided to
+	  tokenize all read-only scripts in the local repository's CVSROOT
+	  directory. Just run 'tokenize' from command line.
+
+	  Note: You have to re-tokenize each time you commit to CVSROOT.
+
+	- You can now remove the work\CVSROOT directory.
+
+2. Maintaining a ChangeLog.
+
+	To update the ChangeLog after you are through with your commits,
+	copy cvs2log.cmd into a directory in your path (preferrably the
+	one where cvs.exe already resides).
+
+	Running cvs2log will recursively walk through the directories
+	updating the ChangeLog in each directory it visits. After
+	updating each ChangeLog, cvs2log will invoke the editor specified
+	by the CVSEDITOR environment variable (or a default editor, if
+	CVSEDITOR is not set). Setting CVSEDITOR to 'epm /m' is a good
+	choice. You are now given the opportunity to edit the ChangeLog.
+
+	After cvs2log finishes its job, you may want to commit the ChangeLog.
+	If you didn't have a ChangeLog before running cvs2log, be sure to do
+	a 'cvs add ChangeLog' for each directory involved first.
+
+	Be aware, though, that in a multi-developer environment, the ChangeLog
+	(as well as any other files you may have checked out) may be modified
+	by other developers as well, so be sure to perform an update and
+	resolve any conflicts first before hacking away.
+
+	cvs2log uses the file .cvsauthors (see the comments on the format) to
+	determine the full name and email address from the login name. Add a
+	line that describes each committer and copy the file to the directory
+	specified by your %ETC% or %HOME% environment variable. Note however,
+	that %HOME% is usually a per user location, so you might want to use
+	%ETC% if more than one person is doing commits on your machine.
+
+	The file .cvsauthors is also used by loginfo to determine the 'From:'
+	address for commit messages.
+
